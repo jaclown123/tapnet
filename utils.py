@@ -21,7 +21,7 @@ def encode_onehot(labels):
 
 def loadsparse(filename):
     df = pd.read_csv(filename, header=None, delimiter=",")
-    a = np.array(df.as_matrix())
+    a = np.array(df.as_matrix())git
     a = sp.csr_matrix(a)
     return a
 
@@ -37,7 +37,8 @@ def loadsparse2(fname):
 
 def loaddata(filename):
     df = pd.read_csv(filename, header=None, delimiter=",")
-    a = np.array(df.as_matrix())
+    #a = np.array(df.as_matrix())
+    a = df.to_numpy()
     return a
 
 
