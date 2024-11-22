@@ -25,7 +25,7 @@ parser.add_argument('--data_path', type=str, default="./data/",
                     help='the path of data.')
 parser.add_argument('--use_muse', action='store_true', default=False,
                     help='whether to use the raw data. Default:False')
-parser.add_argument('--dataset', type=str, default="NATOPS", #NATOPS
+parser.add_argument('--dataset', type=str, default="PenDigits", #NATOPS
                     help='time series dataset. Options: See the datasets list')
 
 # cuda settings
@@ -49,7 +49,7 @@ parser.add_argument('--use_lstm', type=boolean_string, default=True,
                     help='whether to use LSTM for feature extraction. Default:False')
 parser.add_argument('--use_cnn', type=boolean_string, default=True,
                     help='whether to use CNN for feature extraction. Default:False')
-parser.add_argument('--use_rp', type=boolean_string, default=True,
+parser.add_argument('--use_rp', type=boolean_string, default=False,
                     help='Whether to use random projection')
 parser.add_argument('--rp_params', type=str, default='-1,3',
                     help='Parameters for random projection: number of random projection, '
@@ -85,7 +85,6 @@ args.layers = [int(l) for l in args.layers.split(",")]
 args.kernels = [int(l) for l in args.kernels.split(",")]
 args.filters = [int(l) for l in args.filters.split(",")]
 args.rp_params = [int(l) for l in args.rp_params.split(",")]
-
 if not args.use_lstm and not args.use_cnn:
     print("Must specify one encoding method: --use_lstm or --use_cnn")
     print("Program Exiting.")

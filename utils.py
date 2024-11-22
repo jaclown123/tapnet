@@ -21,7 +21,7 @@ def encode_onehot(labels):
 
 def loadsparse(filename):
     df = pd.read_csv(filename, header=None, delimiter=",")
-    a = np.array(df.as_matrix())git
+    a = np.array(df.as_matrix())
     a = sp.csr_matrix(a)
     return a
 
@@ -39,21 +39,35 @@ def loaddata(filename):
     df = pd.read_csv(filename, header=None, delimiter=",")
     #a = np.array(df.as_matrix())
     a = df.to_numpy()
+    print(a.shape)
     return a
 
 
 def load_raw_ts(path, dataset, tensor_format=True):
-    path = path + "raw/" + dataset + "/"
+    path = path + dataset + "/"
+    # save np.load
+    np_load_old = np.load
+
+    # modify the default parameters of np.load
+    np.load = lambda *a, **k: np_load_old(*a, allow_pickle=True, **k)
     x_train = np.load(path + 'X_train.npy')
     y_train = np.load(path + 'y_train.npy')
     x_test = np.load(path + 'X_test.npy')
     y_test = np.load(path + 'y_test.npy')
+    np.load = np_load_old
+
 
     ts = np.concatenate((x_train, x_test), axis=0)
-    ts = np.transpose(ts, axes=(0, 2, 1))
+    print(ts.shape)
+    ts = np.reshape(ts, (3,int( ts.shape[0] / 3), ts.shape[1]))
+    ts = np.transpose(ts, axes=(0,2,1))
     labels = np.concatenate((y_train, y_test), axis=0)
+    print(labels.shape)
+    labels = np.reshape(labels, (3, int(labels.shape[0]/3)))
+    labels = labels.astype('int32')
     nclass = int(np.amax(labels)) + 1
-
+    assert labels.max() < int(nclass), f"Max label {labels.max()} >= nclass {nclass}"
+    assert labels.min() >= 0, f"Min label {labels.min()} < 0"
     # total data size: 934
     train_size = y_train.shape[0]
     # train_size = 10
@@ -64,8 +78,8 @@ def load_raw_ts(path, dataset, tensor_format=True):
 
     if tensor_format:
         # features = torch.FloatTensor(np.array(features))
-        ts = torch.FloatTensor(np.array(ts))
-        labels = torch.LongTensor(labels)
+        ts = torch.FloatTensor(ts.astype(dtype='float32'))#np.array(ts))
+        labels = torch.LongTensor(labels.astype(dtype='int64'))
 
         idx_train = torch.LongTensor(idx_train)
         idx_val = torch.LongTensor(idx_val)
@@ -144,8 +158,10 @@ def normalize(mx):
     # r_mat_inv = sp.diags(r_inv)
     # mx = r_mat_inv.dot(mx)
     row_sums = mx.sum(axis=1)
+    print(row_sums)
     mx = mx.astype('float32')
     row_sums_inverse = 1 / row_sums
+    #for i in range(mx.shape[1]):
     f = mx.multiply(row_sums_inverse)
     return sp.csr_matrix(f).astype('float32')
 

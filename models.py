@@ -71,7 +71,7 @@ class TapNet(nn.Module):
 
 
         # Representation mapping function
-        layers = [fc_input] + layers
+        layers = [467456] + layers
         print("Layers", layers)
         self.mapping = nn.Sequential()
         for i in range(len(layers) - 2):
@@ -171,6 +171,8 @@ class TapNet(nn.Module):
             #
 
         # linear mapping to low-dimensional space
+        # 在forward函数中
+        #x = x.view(x.size(0), -1)  # 展平除batch维度外的所有维
         x = self.mapping(x)
 
         # generate the class protocal with dimension C * D (nclass * dim)
